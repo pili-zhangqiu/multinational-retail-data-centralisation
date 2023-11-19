@@ -22,7 +22,7 @@ class DatabaseConnector():
     '''
     def __init__(self, credentials_filepath: str) -> None:
         self.credentials_filepath = credentials_filepath
-        self.credentials = self.read_db_creds(credentials_filepath)
+        self.credentials = self.read_db_creds()
         self.engine = self.init_db_engine()
         self.db_tables = {}
         
@@ -44,11 +44,6 @@ class DatabaseConnector():
         '''
         Read the credentials from the input filepath. Then, initialise and return 
         an sqlalchemy database engine.
-
-        Parameters:
-        ----------
-        credentials_filepath: str
-            Path to the credentials yaml file
 
         Returns:
         -------
@@ -75,8 +70,12 @@ class DatabaseConnector():
     
     def list_db_tables(self) -> dict:
         '''
-        Prints a list of all the tables in the database, and record them in the
-        self.db_tables parameter.
+        Prints a list of all the tables in each schema of the database and record them.
+
+        Returns:
+        -------
+        self.db_tables: dict
+            Dictionary contain an array of table names for each schema
         '''
         # Create inspector item for the database
         inspector = inspect(self.engine)
@@ -101,4 +100,3 @@ class DatabaseConnector():
 if __name__ == '__main__':
     instance = DatabaseConnector('db_creds.yaml')
     instance.list_db_tables()
-    
