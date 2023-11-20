@@ -98,5 +98,5 @@ class DatabaseConnector():
             
 
 if __name__ == '__main__':
-    instance = DatabaseConnector('db_creds.yaml')
-    instance.list_db_tables()
+    connector = DatabaseConnector('db_creds.yaml')
+    connector.list_db_tables()
