@@ -1,3 +1,4 @@
+import pandas as pd
 import yaml
 
 from sqlalchemy import Engine, create_engine, inspect
@@ -95,7 +96,25 @@ class DatabaseConnector():
             self.db_tables[schema] = tables
         
         return self.db_tables
-            
+    
+    def upload_to_db(self, pd_df: pd.DataFrame, table_name: str):
+        '''
+        Upload a pandas dataframe to the database.
+
+        Parameters:
+        ----------
+        pd_df: str
+            Pandas DataFrame to upload to the database
+        table_name: str
+            Table name to use when uploading to the database
+        '''
+        pd_df.to_sql(
+            name=table_name,
+            con=self.engine,
+            if_exists='append',
+            index=False,
+        )
+        
 
 if __name__ == '__main__':
     connector = DatabaseConnector('db_creds.yaml')
