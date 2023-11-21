@@ -59,13 +59,12 @@ class DataCleaning():
 
 
 if __name__ == '__main__':
-    connector = DatabaseConnector('db_creds.yaml')
+    connector = DatabaseConnector('db_creds_aws.yaml')
     
     table_name = 'legacy_users'
     extractor = DataExtractor()
     df = extractor.read_rds_table(connector, table_name)
 
     cleaner = DataCleaning()
-    cleaner.clean_user_data(df)
-
-
+    df = cleaner.clean_user_data(df)
+    print(df)
