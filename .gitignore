@@ -1,5 +1,6 @@
 # Database
-db_creds.yaml
+db_creds_aws.yaml
+db_creds_local.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
