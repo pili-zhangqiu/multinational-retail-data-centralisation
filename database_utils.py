@@ -99,7 +99,7 @@ class DatabaseConnector():
     
     def upload_to_db(self, pd_df: pd.DataFrame, table_name: str):
         '''
-        Upload a pandas dataframe to the database.
+        Upload a pandas dataframe to the database. If the table exists, replace.
 
         Parameters:
         ----------
@@ -111,11 +111,13 @@ class DatabaseConnector():
         pd_df.to_sql(
             name=table_name,
             con=self.engine,
-            if_exists='append',
+            if_exists='replace',
             index=False,
         )
-        
+
+        print('Table uploaded successfully!')
+
 
 if __name__ == '__main__':
-    connector = DatabaseConnector('db_creds.yaml')
+    connector = DatabaseConnector('db_creds_aws.yaml')
     connector.list_db_tables()

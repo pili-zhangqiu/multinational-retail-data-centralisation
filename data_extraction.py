@@ -18,7 +18,7 @@ class DataExtractor():
         return table
 
 if __name__ == '__main__':
-    connector = DatabaseConnector('db_creds.yaml')
+    connector = DatabaseConnector('db_creds_aws.yaml')
     
     table_name = 'legacy_users'
     extractor = DataExtractor()
