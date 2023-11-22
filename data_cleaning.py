@@ -25,13 +25,13 @@ class DataCleaning():
         df = self.clean_nulls(df)
 
         # Remove all rows with errors in dates
-        df = self.clean_dates(df)
+        df = self.clean_user_dates(df)
 
         # Remove rows with incorrect formatting in first_name and last_name
-        df = self.clean_names(df)
+        df = self.clean_names(df, 'first_name', 'last_name')
 
         # Remove rows with wrong phone_number formatting
-        df = self.clean_phones(df)
+        df = self.clean_phones(df, 'phone_number')
 
         return df
     
@@ -44,7 +44,7 @@ class DataCleaning():
 
         return df
 
-    def clean_dates(self, df: pd.DataFrame) -> pd.DataFrame:
+    def clean_user_dates(self, df: pd.DataFrame) -> pd.DataFrame:
         # Remove rows with wrong date formatting
         df['date_of_birth'] = pd.to_datetime(df['date_of_birth'], errors='coerce').dt.date  
         df['join_date'] = pd.to_datetime(df['join_date'], errors='coerce').dt.date
@@ -59,10 +59,10 @@ class DataCleaning():
 
         return df
     
-    def clean_names(self, df:pd.DataFrame) -> pd.DataFrame:
-        # Remove rows with incorrect formatting in first_name and last_name
-        df = df[(df['first_name'].apply(self.is_valid_name))]
-        df = df[(df['last_name'].apply(self.is_valid_name))]
+    def clean_names(self, df:pd.DataFrame, *column_names) -> pd.DataFrame:
+        # Remove rows with incorrect formatting
+        for column in column_names:
+            df = df[(df[column].apply(self.is_valid_name))]
 
         return df
 
@@ -76,11 +76,10 @@ class DataCleaning():
                 return False
         return True
 
-    def clean_phones(self, df:pd.DataFrame) -> pd.DataFrame:
-        # TODO: Doesn't seem to do anything
+    def clean_phones(self, df: pd.DataFrame, column_name: str) -> pd.DataFrame:
         # Remove rows with wrong phone_number formatting
         regex_expression = '^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$'
-        df.loc[~df['phone_number'].str.match(regex_expression), 'phone_number'] = np.nan         # For every row  where the Phone column does not match our regular expression, replace the value with NaN
+        df.loc[~df[column_name].str.match(regex_expression), 'phone_number'] = np.nan         # For every row  where the Phone column does not match our regular expression, replace the value with NaN
         df = df.dropna()
 
         return df
