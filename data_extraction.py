@@ -1,4 +1,5 @@
 import pandas as pd
+from tabula import read_pdf
 
 from database_utils import DatabaseConnector
 
@@ -16,6 +17,16 @@ class DataExtractor():
         table = pd.read_sql_table(table_name, db_connector.engine)
 
         return table
+    
+    def retrieve_pdf_data(self, url: str):
+        '''
+        Extract data from from a table in a PDF file, given a URL link. Then, return a Pandas
+        DataFrame with the table information.
+        '''
+        # Read remote pdf into a list of DataFrame
+        df = read_pdf(url)
+
+        return df 
 
 if __name__ == '__main__':
     connector = DatabaseConnector('db_creds_aws.yaml')
