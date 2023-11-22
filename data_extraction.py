@@ -1,5 +1,5 @@
 import pandas as pd
-from tabula import read_pdf
+from tabula.io import read_pdf
 
 from database_utils import DatabaseConnector
 
@@ -10,7 +10,7 @@ class DataExtractor():
     def __init__(self):
         pass
 
-    def read_rds_table(self, db_connector: DatabaseConnector, table_name: str):
+    def read_rds_table(self, db_connector: DatabaseConnector, table_name: str) -> pd.DataFrame:
         '''
         Extract the database table to a pandas DataFrame.
         '''
@@ -18,13 +18,13 @@ class DataExtractor():
 
         return table
     
-    def retrieve_pdf_data(self, url: str):
+    def retrieve_pdf_data(self, url: str) -> pd.DataFrame:
         '''
         Extract data from from a table in a PDF file, given a URL link. Then, return a Pandas
         DataFrame with the table information.
         '''
         # Read remote pdf into a list of DataFrame
-        df = read_pdf(url)
+        df = read_pdf(url, multiple_tables=True, pages="all")
 
         return df 
 
