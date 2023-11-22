@@ -16,6 +16,7 @@ class DataCleaning():
     def __init__(self):
             pass
 
+    # ------------- Main data cleansers -------------    
     def clean_user_data(self, df: pd.DataFrame):
         '''
         Clean the user data from NULL values, errors with dates, incorrectly typed values 
@@ -35,15 +36,20 @@ class DataCleaning():
 
         return df
     
-    def clean_nulls(self, df: pd.DataFrame) -> pd.DataFrame:
-        # Remove rows with any value being NULL or NaN
-        df = df.dropna()
+    def clean_card_data(self, df: pd.DataFrame) -> pd.DataFrame:
+        '''
+        Clean card data, removing any erroneous values, NULL values or errors with formatting.
+        '''
+        # Remove all rows containing NULL values
+        df = self.clean_nulls(df)
 
-        # Remove rows with any value being a string 'NULL'
-        df = df[~df.isin(['NULL', 'null', 'Null']).any(axis=1)]
+        # Remove all rows with errors in dates
+        df = self.clean_card_dates(df)
 
-        return df
+        # Remove invalid card numbers
+        df = self.clean_card_number(df, 'card_number')
 
+    # ------------- Table-specific data cleaning utils -------------    
     def clean_user_dates(self, df: pd.DataFrame) -> pd.DataFrame:
         # Remove rows with wrong date formatting
         df['date_of_birth'] = pd.to_datetime(df['date_of_birth'], errors='coerce').dt.date  
@@ -56,6 +62,31 @@ class DataCleaning():
         current_date = date.today()
         df = df[~(df['date_of_birth'] > current_date)]
         df = df[~(df['join_date'] > current_date)]
+
+        return df
+    
+    def clean_card_dates(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Remove rows with wrong date formatting
+        df['expiry_date'] = pd.to_datetime(df['expiry_date'], format='%m/%y', errors='coerce').dt.date  
+        df['date_payment_confirmed'] = pd.to_datetime(df['date_payment_confirmed'], errors='coerce').dt.date
+
+        # NOTE: Do we want to check if a payment was made after expiry date? Maybe it's not part of what the
+        # data cleaning function should do
+
+        # Remove rows where dates are before or after the current date
+        current_date = date.today()
+        # df = df[~(df['expiry_date'] < current_date)]    # NOTE: Keeping expired card data as it might be useful
+        df = df[~(df['date_payment_confirmed'] > current_date)]
+
+        return df
+        
+    # ------------- General data cleaning utils -------------    
+    def clean_nulls(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Remove rows with any value being NULL or NaN
+        df = df.dropna()
+
+        # Remove rows with any value being a string 'NULL'
+        df = df[~df.isin(['NULL', 'null', 'Null']).any(axis=1)]
 
         return df
     
@@ -83,6 +114,20 @@ class DataCleaning():
         df = df.dropna()
 
         return df
+
+    def clean_card_number(self, df: pd.DataFrame, column_name: str) -> pd.DataFrame:
+        # Check if it's a valid card number: positive integer with 8 to 19 digits
+        df = df[(df[column_name].apply(self.is_valid_card_number))]
+    
+    @staticmethod
+    def is_valid_card_number(card_number: str):
+        # Check that it is a positive integer number
+        if card_number.is_integer():
+            if int(card_number) > 0:
+                # Note: Payment card numbers are composed of 8 to 19 digits.
+                if len(card_number) >= 8 and len(card_number) <= 19:
+                    return True
+        return False
 
 if __name__ == '__main__':
     connector = DatabaseConnector('db_creds_aws.yaml')
