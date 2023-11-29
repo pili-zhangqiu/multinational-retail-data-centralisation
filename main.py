@@ -64,4 +64,7 @@ if __name__ == '__main__':
     print('\n----- STORE DATA: -----')
 
     # Retrieve data from all stores   
-    stores_data = extractor.retrieve_stores_data()
+    df_stores = extractor.retrieve_stores_data()
+    
+    # Clean stores data
+    df_stores = cleaner.called_clean_store_data(df_stores)

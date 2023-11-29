@@ -50,6 +50,18 @@ class DataCleaning():
         df = self.clean_card_number(df, 'card_number')
 
         return df
+    
+    def called_clean_store_data (self, df: pd.DataFrame) -> pd.DataFrame:
+        '''
+        Clean store data, removing any erroneous values, NULL values or errors with formatting.
+        '''
+        # Remove the 'lat' column, as it seems to be an empty duplicate of 'latitude'
+        df.drop(columns=['lat'], inplace=True)
+
+        # Remove all rows containing NULL values
+        df = self.clean_nulls(df)
+
+        return df
 
     # ------------- Table-specific data cleaning utils -------------    
     def clean_user_dates(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -88,9 +100,22 @@ class DataCleaning():
         df = df.dropna()
 
         # Remove rows with any value being a string 'NULL'
-        df = df[~df.isin(['NULL', 'null', 'Null']).any(axis=1)]
-
+        for column in list(df.columns.values):
+            df = df[~(df[column].apply(self.is_null_str))]
+            
         return df
+    
+    @staticmethod
+    def is_null_str(var: str):
+        var_str =  str(var)
+        var_str_lowercase = var_str.lower()
+        
+        list_null_str = ['null', 'none', 'n/a', 'nan']
+        
+        if var_str_lowercase in list_null_str:
+            return True
+        else:
+            return False   
     
     def clean_names(self, df:pd.DataFrame, *column_names) -> pd.DataFrame:
         # Remove rows with incorrect formatting
