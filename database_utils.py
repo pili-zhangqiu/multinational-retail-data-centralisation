@@ -117,6 +117,31 @@ class DatabaseConnector():
 
         print(f'Table {table_name} uploaded successfully to database!')
 
+    def retrieve_token(self, filepath: str, token_key: str) -> str:
+        '''
+        Returns a specific token from a YAML file given its path and key name.
+
+        Parameters:
+        ----------
+        filepath: str
+            Filepath to the credentials YAML
+        token_key: str
+            Key name under which the token is stored in the YAML
+
+        Returns:
+        -------
+        token: str
+            Authorization token
+        '''
+        # Parse YAML
+        with open(filepath, 'r') as file:
+            info = yaml.safe_load(file)
+
+        # Get token
+        token = info[token_key]
+
+        return token
+
 
 if __name__ == '__main__':
     connector = DatabaseConnector('db_creds_aws_rds.yaml')

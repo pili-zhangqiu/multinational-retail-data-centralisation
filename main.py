@@ -19,8 +19,9 @@ if __name__ == '__main__':
     cleaner = DataCleaning()
     
     # ------------------ User Data ------------------
-    # Extract table data
     print('\n----- USER DATA: -----')
+
+    # Extract table data
     read_table_name = 'legacy_users'
     
     print('Reading user data from database...')
@@ -37,8 +38,9 @@ if __name__ == '__main__':
     connector_local.upload_to_db(df_user, 'dim_users')
     
     # ------------------ Card Data ------------------
+    '''print('\n----- CARD DATA: -----')
+
     # Extract table data from PDF
-    print('\n----- CARD DATA: -----')
     pdf_url = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
     
     print('Extracting table from PDF...')
@@ -52,4 +54,12 @@ if __name__ == '__main__':
 
     # Upload dataframe as table to the local PostgreSQL database
     print('Uploading dataframe to local database...')
-    connector_local.upload_to_db(df_card, 'dim_card_details')
+    connector_local.upload_to_db(df_card, 'dim_card_details')'''
+
+    # ------------------ Store Data ------------------
+    print('\n----- STORE DATA: -----')
+    # Retrieve token for authorization
+    token = connector_aws_rds.retrieve_token('db_creds_aws_api.yaml', 'x-api-key')
+
+    print(token)
+    
