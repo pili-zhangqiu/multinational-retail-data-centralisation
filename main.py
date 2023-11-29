@@ -7,20 +7,49 @@ from data_cleaning import DataCleaning
 from data_extraction import DataExtractor
 
 if __name__ == '__main__':
-    # Create connection to the database
+    '''
+    Extract, Process and Upload Data
+    '''
+    # Create connection to the databases
     connector_aws = DatabaseConnector('db_creds_aws.yaml')
-    
-    # Extract table data
-    read_table_name = 'legacy_users'
+    connector_local = DatabaseConnector('db_creds_local.yaml')
+
+    # Prepare instances of extraction and cleaning utility classes
     extractor = DataExtractor()
-    df = extractor.read_rds_table(connector_aws, read_table_name)
+    cleaner = DataCleaning()
+    
+    # ------------------ User Data ------------------
+    # Extract table data
+    print('\n----- USER DATA: -----')
+    read_table_name = 'legacy_users'
+    
+    print('Reading user data from database...')
+    df_user = extractor.read_rds_table(connector_aws, read_table_name)
+    print('DONE \n')
 
     # Clean the data
-    cleaner = DataCleaning()
-    df = cleaner.clean_user_data(df)
+    print('Cleaning user data...')
+    df_user = cleaner.clean_user_data(df_user)
+    print('DONE \n')
+
+    # Upload dataframe as table to the local PostgreSQL database
+    print('Uploading dataframe to local database...')
+    connector_local.upload_to_db(df_user, 'dim_users')
     
-    # Upload dataframe as table to the database
-    connector_local = DatabaseConnector('db_creds_local.yaml')
-    upload_table_name = 'dim_users'
-    connector_local.upload_to_db(df, upload_table_name)
+    # ------------------ Card Data ------------------
+    # Extract table data from PDF
+    print('\n----- CARD DATA: -----')
+    pdf_url = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
     
+    print('Extracting table from PDF...')
+    df_card = extractor.retrieve_pdf_data(pdf_url)
+    print('DONE \n')
+
+    # Clean the data
+    print('Cleaning card data...')
+    df_card = cleaner.clean_card_data(df_card)
+    print('DONE \n')
+
+    # Upload dataframe as table to the local PostgreSQL database
+    print('Uploading dataframe to local database...')
+    connector_local.upload_to_db(df_card, 'dim_card_details')

@@ -115,7 +115,7 @@ class DatabaseConnector():
             index=False,
         )
 
-        print('Table uploaded successfully!')
+        print(f'Table {table_name} uploaded successfully to database!')
 
 
 if __name__ == '__main__':
