@@ -20,22 +20,36 @@ if __name__ == '__main__':
     
     # ------------------ User Data ------------------
     # Extract table data
+    print('\n----- USER DATA: -----')
     read_table_name = 'legacy_users'
+    
+    print('Reading user data from database...')
     df_user = extractor.read_rds_table(connector_aws, read_table_name)
+    print('DONE \n')
 
     # Clean the data
+    print('Cleaning user data...')
     df_user = cleaner.clean_user_data(df_user)
-    
+    print('DONE \n')
+
     # Upload dataframe as table to the local PostgreSQL database
+    print('Uploading dataframe to local database...')
     connector_local.upload_to_db(df_user, 'dim_users')
     
     # ------------------ Card Data ------------------
     # Extract table data from PDF
+    print('\n----- CARD DATA: -----')
     pdf_url = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
+    
+    print('Extracting table from PDF...')
     df_card = extractor.retrieve_pdf_data(pdf_url)
+    print('DONE \n')
 
     # Clean the data
+    print('Cleaning card data...')
     df_card = cleaner.clean_card_data(df_card)
-    
+    print('DONE \n')
+
     # Upload dataframe as table to the local PostgreSQL database
+    print('Uploading dataframe to local database...')
     connector_local.upload_to_db(df_card, 'dim_card_details')

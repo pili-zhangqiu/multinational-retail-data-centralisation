@@ -49,6 +49,8 @@ class DataCleaning():
         # Remove invalid card numbers
         df = self.clean_card_number(df, 'card_number')
 
+        return df
+
     # ------------- Table-specific data cleaning utils -------------    
     def clean_user_dates(self, df: pd.DataFrame) -> pd.DataFrame:
         # Remove rows with wrong date formatting
@@ -118,11 +120,13 @@ class DataCleaning():
     def clean_card_number(self, df: pd.DataFrame, column_name: str) -> pd.DataFrame:
         # Check if it's a valid card number: positive integer with 8 to 19 digits
         df = df[(df[column_name].apply(self.is_valid_card_number))]
+
+        return df
     
     @staticmethod
     def is_valid_card_number(card_number: str):
         # Check that it is a positive integer number
-        if card_number.is_integer():
+        if card_number.isnumeric():
             if int(card_number) > 0:
                 # Note: Payment card numbers are composed of 8 to 19 digits.
                 if len(card_number) >= 8 and len(card_number) <= 19:

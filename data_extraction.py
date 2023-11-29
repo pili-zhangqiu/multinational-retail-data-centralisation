@@ -24,8 +24,11 @@ class DataExtractor():
         DataFrame with the table information.
         '''
         # Read remote pdf into a list of DataFrame
-        df = read_pdf(url, multiple_tables=True, pages="all")
+        extracted_data = read_pdf(url, multiple_tables=True, pages="all", output_format="dataframe")
 
+        # Convert to Pandas dataframe
+        df = extracted_data[0]
+        
         return df 
 
 if __name__ == '__main__':
