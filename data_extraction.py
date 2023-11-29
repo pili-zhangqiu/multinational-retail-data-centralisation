@@ -120,7 +120,8 @@ class DataExtractor():
             sys.stdout.write(f'\rRetrieving data from stores... {retrieval_progress_pct}% ({store_id}/{num_stores})')
             sys.stdout.flush()
 
-        return stores_data
+        df_stores_data = pd.concat(stores_data)
+        return df_stores_data
 
 if __name__ == '__main__':
     connector = DatabaseConnector('db_creds_aws_rds.yaml')
