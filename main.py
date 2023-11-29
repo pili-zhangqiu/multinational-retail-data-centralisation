@@ -67,4 +67,9 @@ if __name__ == '__main__':
     df_stores = extractor.retrieve_stores_data()
     
     # Clean stores data
+    print('Cleaning store data...')
     df_stores = cleaner.called_clean_store_data(df_stores)
+    
+    # Upload dataframe as table to the local PostgreSQL database
+    print('Uploading dataframe to local database...')
+    connector_local.upload_to_db(df_stores, 'dim_store_details')
