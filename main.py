@@ -11,7 +11,7 @@ if __name__ == '__main__':
     Extract, Process and Upload Data
     '''
     # Create connection to the databases
-    connector_aws = DatabaseConnector('db_creds_aws.yaml')
+    connector_aws_rds = DatabaseConnector('db_creds_aws_rds.yaml')
     connector_local = DatabaseConnector('db_creds_local.yaml')
 
     # Prepare instances of extraction and cleaning utility classes
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     read_table_name = 'legacy_users'
     
     print('Reading user data from database...')
-    df_user = extractor.read_rds_table(connector_aws, read_table_name)
+    df_user = extractor.read_rds_table(connector_aws_rds, read_table_name)
     print('DONE \n')
 
     # Clean the data

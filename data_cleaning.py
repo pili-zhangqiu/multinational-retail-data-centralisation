@@ -134,7 +134,7 @@ class DataCleaning():
         return False
 
 if __name__ == '__main__':
-    connector = DatabaseConnector('db_creds_aws.yaml')
+    connector = DatabaseConnector('db_creds_aws_rds.yaml')
     
     table_name = 'legacy_users'
     extractor = DataExtractor()
