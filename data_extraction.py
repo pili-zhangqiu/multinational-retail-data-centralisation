@@ -1,6 +1,8 @@
 import pandas as pd
 import requests
+import sys
 import yaml
+
 from tabula.io import read_pdf
 
 from database_utils import DatabaseConnector
@@ -108,10 +110,15 @@ class DataExtractor():
 
         # Loop through all stores and save the data
         stores_data = []
-        for store_id in range(1,num_stores):
+        for store_id in range(num_stores):
+            # Get store details and append to list
             store_data = self.retrieve_store_data(store_id)
-            print(store_data)
             stores_data.append(store_data)
+
+            # Print progress
+            retrieval_progress_pct = round(((store_id + 1) / num_stores * 100))
+            sys.stdout.write(f'\rRetrieving data from stores... {retrieval_progress_pct}% ({store_id}/{num_stores})')
+            sys.stdout.flush()
 
         return stores_data
 

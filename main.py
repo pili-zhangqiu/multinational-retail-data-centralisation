@@ -19,6 +19,7 @@ if __name__ == '__main__':
     cleaner = DataCleaning()
     
     # ------------------ User Data ------------------
+    '''    
     print('\n----- USER DATA: -----')
 
     # Extract table data
@@ -36,9 +37,11 @@ if __name__ == '__main__':
     # Upload dataframe as table to the local PostgreSQL database
     print('Uploading dataframe to local database...')
     connector_local.upload_to_db(df_user, 'dim_users')
+    '''
     
     # ------------------ Card Data ------------------
-    '''print('\n----- CARD DATA: -----')
+    '''
+    print('\n----- CARD DATA: -----')
 
     # Extract table data from PDF
     pdf_url = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
@@ -54,11 +57,11 @@ if __name__ == '__main__':
 
     # Upload dataframe as table to the local PostgreSQL database
     print('Uploading dataframe to local database...')
-    connector_local.upload_to_db(df_card, 'dim_card_details')'''
+    connector_local.upload_to_db(df_card, 'dim_card_details')
+    '''
 
     # ------------------ Store Data ------------------
     print('\n----- STORE DATA: -----')
 
     # Retrieve data from all stores   
     stores_data = extractor.retrieve_stores_data()
-    print(stores_data)
