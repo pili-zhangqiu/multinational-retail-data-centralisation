@@ -60,6 +60,12 @@ if __name__ == '__main__':
     print('\n----- STORE DATA: -----')
     # Retrieve token for authorization
     token = connector_aws_rds.retrieve_token('db_creds_aws_api.yaml', 'x-api-key')
-
-    print(token)
     
+    # Get number of stores from API
+    endpoint_url = 'https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores'
+    headers = {
+        'x-api-key': token
+    }
+
+    num_stores = extractor.list_number_of_stores(endpoint_url, headers)
+    print(num_stores)
