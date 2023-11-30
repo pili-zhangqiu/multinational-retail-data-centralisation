@@ -22,57 +22,31 @@ class DataCleaning():
         Clean the user data from NULL values, errors with dates, incorrectly typed values 
         and rows filled with the wrong information.
         '''
-        # Remove all rows containing NULL values
-        df = self.clean_nulls(df)
-
-        # Remove all rows with errors in dates
-        df = self.clean_user_dates(df)
-
-        # Remove rows with incorrect formatting in first_name and last_name
-        df = self.clean_names(df, 'first_name', 'last_name')
-
-        # Remove rows with wrong phone_number formatting
-        df = self.clean_phones(df, 'phone_number')
-
+        df = self.clean_nulls(df)                               # Remove all rows containing NULL values
+        df = self.clean_user_dates(df)                          # Remove all rows with errors in dates
+        df = self.clean_names(df, 'first_name', 'last_name')    # Remove rows with incorrect formatting in first_name and last_name
+        df = self.clean_phones(df, 'phone_number')              # Remove rows with wrong phone_number formatting
         return df
     
     def clean_card_data(self, df: pd.DataFrame) -> pd.DataFrame:
         '''
         Clean card data, removing any erroneous values, NULL values or errors with formatting.
         '''
-        # Remove all rows containing NULL values
-        df = self.clean_nulls(df)
-
-        # Remove all rows with errors in dates
-        df = self.clean_card_dates(df)
-
-        # Remove invalid card numbers
-        df = self.clean_card_number(df, 'card_number')
-
+        df = self.clean_nulls(df)                       # Remove all rows containing NULL values
+        df = self.clean_card_dates(df)                  # Remove all rows with errors in dates
+        df = self.clean_card_number(df, 'card_number')  # Remove invalid card numbers
         return df
     
     def called_clean_store_data (self, df: pd.DataFrame) -> pd.DataFrame:
         '''
         Clean store data, removing any erroneous values, NULL values or errors with formatting.
         '''
-        # Remove the 'lat' column, as it seems to be an empty duplicate of 'latitude'
-        df.drop(columns=['lat'], inplace=True)
+        df.drop(columns=['lat'], inplace=True)  # Remove the 'lat' column, as it seems to be an empty duplicate of 'latitude'
+        df = self.clean_nulls(df)               # Remove all rows containing NULL values
 
-        # Remove all rows containing NULL values
-        df = self.clean_nulls(df)
-        
-        # Remove all rows containing invalid latitude or longitude
-        df = self.clean_lat_lon(df)
-
-        # Remove all rows containing invalid localities
-        df = self.clean_names(df, 'locality')
-        print(df)
-        print(' ')
-
-        # Remove all rows containing invalid store codes
-        df = self.clean_store_code(df)
-        print(df)
-
+        df = self.clean_lat_lon(df)             # Remove all rows containing invalid latitude or longitude
+        df = self.clean_names(df, 'locality')   # Remove all rows containing invalid localities
+        df = self.clean_store_code(df)          # Remove all rows containing invalid store codes
         return df
 
     # ------------- General data cleaning utils -------------    
