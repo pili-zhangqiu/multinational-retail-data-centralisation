@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import string
+import yaml
 
 from datetime import date
 from typing import List
@@ -14,7 +15,13 @@ class DataCleaning():
     Utility class to clean data from specific data sources.
     '''
     def __init__(self):
-            pass
+        self.validation_utils = self.load_yaml('validation_utils.yaml')
+
+    # ------------- Init utils-------------    
+    def load_yaml(self, filepath: str) -> object:
+        with open(filepath, 'r') as file:
+            info = yaml.safe_load(file)
+        return info
 
     # ------------- Main data cleansers -------------    
     def clean_user_data(self, df: pd.DataFrame):
@@ -41,18 +48,25 @@ class DataCleaning():
         '''
         Clean store data, removing any erroneous values, NULL values or errors with formatting.
         '''
-        df.drop(columns=['lat'], inplace=True)  # Remove the 'lat' column, as it seems to be an empty duplicate of 'latitude'
-        df = self.clean_nulls(df)               # Remove all rows containing NULL values
+        df.drop(columns=['lat'], inplace=True)        # Remove the 'lat' column, as it seems to be an empty duplicate of 'latitude'
+        df = self.clean_nulls(df)                     # Remove all rows containing NULL values
 
-        df = self.clean_lat_lon(df)             # Remove all rows containing invalid latitude or longitude
-        df = self.clean_names(df, 'locality')   # Remove all rows containing invalid localities
-        df = self.clean_store_code(df)          # Remove all rows containing invalid store codes
+        # Clean store-specific columns
+        df = self.clean_store_code(df)                # Remove all rows containing invalid store codes
+        df[pd.to_numeric(df['staff_numbers'], errors='coerce').notnull()]   # Remove all rows containing non-numerical staff numbers
+
+        # Clean other columns
+        df = self.clean_lat_lon(df)                   # Remove all rows containing invalid latitude or longitude
+        df = self.clean_names(df, 'locality')         # Remove all rows containing invalid localities
+        df = self.clean_country_codes(df)             # Remove all rows containing invalid or non-UN approved country codes
+        df = self.clean_continents(df, 'continent')   # Remove all rows containing invalid or non-UN approved country codes
+
         return df
 
     # ------------- General data cleaning utils -------------    
     def clean_nulls(self, df: pd.DataFrame) -> pd.DataFrame:
         # Remove rows with any value being NULL or NaN
-        df = df.dropna()
+        df.dropna(inplace=True)
 
         # Remove rows with any value being a string 'NULL'
         for column in list(df.columns.values):
@@ -88,14 +102,40 @@ class DataCleaning():
             if char not in valid_name_characters:
                 return False
         return True
-
+    
     def clean_phones(self, df: pd.DataFrame, column_name: str) -> pd.DataFrame:
         # Remove rows with wrong phone_number formatting
         regex_expression = '^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$'
         df.loc[~df[column_name].str.match(regex_expression), 'phone_number'] = np.nan         # For every row  where the Phone column does not match our regular expression, replace the value with NaN
-        df = df.dropna()
+        df.dropna(inplace=True)
 
         return df
+    
+    def clean_continents(self, df: pd.DataFrame, *column_names) -> pd.DataFrame:
+        # Remove rows with invalid or wrong continent names
+        for column in column_names:
+            df = df[(df[column].apply(self.is_valid_continent))]
+        return df
+    
+    def is_valid_continent(self, continent: str) -> bool:
+        # Import valid country codes from yaml       
+        continent_lowercase = continent.lower()
+        if continent_lowercase in list(self.validation_utils['continent_list']):
+            return True
+        else: return False
+
+    def clean_country_codes(self, df: pd.DataFrame, *column_names) -> pd.DataFrame:
+        # Remove rows with non UN-approved country codes
+        for column in column_names:
+            df = df[(df[column].apply(self.is_valid_country_code))]
+        return df
+    
+    def is_valid_country_code(self, country_code: str) -> bool:
+        # Import valid country codes from yaml       
+        country_code_uppercase = country_code.upper()
+        if country_code_uppercase in list(self.validation_utils['un_country_list'].keys()):
+            return True
+        else: return False
     
     def is_alphabetical(self, var: str) -> bool:
         '''
@@ -184,6 +224,17 @@ class DataCleaning():
         return False
 
     # ------------- Store table specific data cleaning utils -------------    
+    def clean_store_dates(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Remove rows with wrong date formatting
+        df['opening_date'] = pd.to_datetime(df['opening_date'], errors='coerce', yearfirst=True).dt.date  
+        df.dropna(inplace=True)
+
+        # Remove rows where dates are after the current date
+        current_date = date.today()
+        df = df[~(df['opening_date'] > current_date)]
+
+        return df
+    
     def clean_lat_lon(self, df: pd.DataFrame) -> pd.DataFrame:
         # Check if it's a valid latitude and longitude, if not remove
         df = df[(df['latitude'].apply(self.is_valid_lat))]
