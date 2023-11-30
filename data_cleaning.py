@@ -64,39 +64,17 @@ class DataCleaning():
         # Remove all rows containing invalid latitude or longitude
         df = self.clean_lat_lon(df)
 
-        return df
+        # Remove all rows containing invalid localities
+        df = self.clean_names(df, 'locality')
+        print(df)
+        print(' ')
 
-    # ------------- Table-specific data cleaning utils -------------    
-    def clean_user_dates(self, df: pd.DataFrame) -> pd.DataFrame:
-        # Remove rows with wrong date formatting
-        df['date_of_birth'] = pd.to_datetime(df['date_of_birth'], errors='coerce').dt.date  
-        df['join_date'] = pd.to_datetime(df['join_date'], errors='coerce').dt.date
-
-        # Remove rows where joint_date is after date_of_birth
-        df = df[~(df['join_date'] < df['date_of_birth'])]
-
-        # Remove rows where dates are after the current date
-        current_date = date.today()
-        df = df[~(df['date_of_birth'] > current_date)]
-        df = df[~(df['join_date'] > current_date)]
+        # Remove all rows containing invalid store codes
+        df = self.clean_store_code(df)
+        print(df)
 
         return df
-    
-    def clean_card_dates(self, df: pd.DataFrame) -> pd.DataFrame:
-        # Remove rows with wrong date formatting
-        df['expiry_date'] = pd.to_datetime(df['expiry_date'], format='%m/%y', errors='coerce').dt.date  
-        df['date_payment_confirmed'] = pd.to_datetime(df['date_payment_confirmed'], errors='coerce').dt.date
 
-        # NOTE: Do we want to check if a payment was made after expiry date? Maybe it's not part of what the
-        # data cleaning function should do
-
-        # Remove rows where dates are before or after the current date
-        current_date = date.today()
-        # df = df[~(df['expiry_date'] < current_date)]    # NOTE: Keeping expired card data as it might be useful
-        df = df[~(df['date_payment_confirmed'] > current_date)]
-
-        return df
-        
     # ------------- General data cleaning utils -------------    
     def clean_nulls(self, df: pd.DataFrame) -> pd.DataFrame:
         # Remove rows with any value being NULL or NaN
@@ -144,9 +122,79 @@ class DataCleaning():
         df = df.dropna()
 
         return df
+    
+    def is_alphabetical(self, var: str) -> bool:
+        '''
+        Check if a string only contains alphabetical characters
+        '''
+        valid_characters = list(string.ascii_lowercase)
+        
+        var_lowercase = var.lower()
+        for char in var_lowercase:
+            if char not in valid_characters:
+                return False
+        return True
+    
+    def is_float(self, var: str) -> bool:
+        '''
+        Check if a string can be coverted to a float
+        '''
+        try:
+            float(var)
+            return True
+        except ValueError:
+            return False
+    
+    def is_int(self, var: str) -> bool:
+        '''
+        Check if a string can be coverted to an int
+        '''
+        # Make sure it doesn't have decimal places
+        for char in var:
+            if char == '.':
+                return False
+        
+        # Check if it's numerical
+        try:
+            int(var)
+            return True
+        except ValueError:
+            return False
+        
+    # ------------- User table specific data cleaning utils -------------    
+    def clean_user_dates(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Remove rows with wrong date formatting
+        df['date_of_birth'] = pd.to_datetime(df['date_of_birth'], errors='coerce').dt.date  
+        df['join_date'] = pd.to_datetime(df['join_date'], errors='coerce').dt.date
 
+        # Remove rows where joint_date is after date_of_birth
+        df = df[~(df['join_date'] < df['date_of_birth'])]
+
+        # Remove rows where dates are after the current date
+        current_date = date.today()
+        df = df[~(df['date_of_birth'] > current_date)]
+        df = df[~(df['join_date'] > current_date)]
+
+        return df
+    
+    # ------------- Card table specific data cleaning utils -------------    
+    def clean_card_dates(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Remove rows with wrong date formatting
+        df['expiry_date'] = pd.to_datetime(df['expiry_date'], format='%m/%y', errors='coerce').dt.date  
+        df['date_payment_confirmed'] = pd.to_datetime(df['date_payment_confirmed'], errors='coerce').dt.date
+
+        # NOTE: Do we want to check if a payment was made after expiry date? Maybe it's not part of what the
+        # data cleaning function should do
+
+        # Remove rows where dates are before or after the current date
+        current_date = date.today()
+        # df = df[~(df['expiry_date'] < current_date)]    # NOTE: Keeping expired card data as it might be useful
+        df = df[~(df['date_payment_confirmed'] > current_date)]
+
+        return df
+    
     def clean_card_number(self, df: pd.DataFrame, column_name: str) -> pd.DataFrame:
-        # Check if it's a valid card number: positive integer with 8 to 19 digits
+        # Check if it's a valid card number: positive integer with 8 to 19 digits, , if not remove
         df = df[(df[column_name].apply(self.is_valid_card_number))]
 
         return df
@@ -160,9 +208,10 @@ class DataCleaning():
                 if len(card_number) >= 8 and len(card_number) <= 19:
                     return True
         return False
-    
+
+    # ------------- Store table specific data cleaning utils -------------    
     def clean_lat_lon(self, df: pd.DataFrame) -> pd.DataFrame:
-        # Check if it's a valid latitude and longitude
+        # Check if it's a valid latitude and longitude, if not remove
         df = df[(df['latitude'].apply(self.is_valid_lat))]
         df = df[(df['longitude'].apply(self.is_valid_lon))]
         
@@ -190,15 +239,44 @@ class DataCleaning():
         else:
             return False
     
-    def is_float(self, var: str) -> bool:
-        '''
-        Check if a string can be coverted to a float
-        '''
+    def clean_store_code(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Check if it's a valid store code (e.g. CH-99475026), if not remove
+        df = df[(df['store_code'].apply(self.is_valid_store_code))]        
+        return df
+
+    @staticmethod
+    def is_valid_store_code(store_code: str) -> bool:
+        # Check if it's a valid store code (e.g. CH-99475026)
+        # Split code
         try:
-            float(var)
+            code_prefix = store_code.split('-')[0]
+            code_suffix = store_code.split('-')[1]
+
+            # First 2 chars should be letters
+            if len(code_prefix) == 2:
+                valid_characters_prefix = list(string.ascii_lowercase)
+            
+                prefix_lowercase = code_prefix.lower()
+                for char in prefix_lowercase:
+                    if char not in valid_characters_prefix:
+                        return False
+            else: return False
+        
+            # Last 8 chars can be a mix of alphabetical letters and numbers
+            if len(code_suffix) == 8:
+                valid_characters_suffix = list(string.ascii_lowercase) +  [str(num) for num in range(10)]
+            
+                suffix_lowercase = code_suffix.lower()
+                for char in suffix_lowercase:
+                    if char not in valid_characters_suffix:
+                        return False
+            else: return False
+
             return True
-        except ValueError:
+        
+        except IndexError:
             return False
+
         
 
 if __name__ == '__main__':
