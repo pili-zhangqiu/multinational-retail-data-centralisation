@@ -119,5 +119,5 @@ class DatabaseConnector():
 
 
 if __name__ == '__main__':
-    connector = DatabaseConnector('db_creds_aws.yaml')
+    connector = DatabaseConnector('db_creds_aws_rds.yaml')
     connector.list_db_tables()
