@@ -60,6 +60,9 @@ class DataCleaning():
 
         # Remove all rows containing NULL values
         df = self.clean_nulls(df)
+        
+        # Remove all rows containing invalid latitude or longitude
+        df = self.clean_lat_lon(df)
 
         return df
 
@@ -106,7 +109,7 @@ class DataCleaning():
         return df
     
     @staticmethod
-    def is_null_str(var: str):
+    def is_null_str(var: str) -> bool:
         var_str =  str(var)
         var_str_lowercase = var_str.lower()
         
@@ -125,7 +128,7 @@ class DataCleaning():
         return df
 
     @staticmethod
-    def is_valid_name(name: str):
+    def is_valid_name(name: str) -> bool:
         valid_name_characters = list(string.ascii_lowercase) + list(string.ascii_uppercase) + list(['-', ' '])
         
         name_without_accents = unidecode(name)
@@ -149,7 +152,7 @@ class DataCleaning():
         return df
     
     @staticmethod
-    def is_valid_card_number(card_number: str):
+    def is_valid_card_number(card_number: str) -> bool:
         # Check that it is a positive integer number
         if card_number.isnumeric():
             if int(card_number) > 0:
@@ -157,6 +160,46 @@ class DataCleaning():
                 if len(card_number) >= 8 and len(card_number) <= 19:
                     return True
         return False
+    
+    def clean_lat_lon(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Check if it's a valid latitude and longitude
+        df = df[(df['latitude'].apply(self.is_valid_lat))]
+        df = df[(df['longitude'].apply(self.is_valid_lon))]
+        
+        return df
+      
+    def is_valid_lat(self, latitude: str) -> bool:
+        # Check it is a numeric value
+        if self.is_float(latitude):
+            # Check it is in the correct range (-90 to 90 deg)
+            if -90 <= float(latitude) <= 90:
+                return True
+            else: 
+                return False
+        else:
+            return False
+          
+    def is_valid_lon(self, longitude: str) -> bool:
+        # Check it is a numeric value
+        if self.is_float(longitude):
+            # Check it is in the correct range (-180 to 180 deg)
+            if -180 <= float(longitude) <= 180:
+                return True
+            else: 
+                return False
+        else:
+            return False
+    
+    def is_float(self, var: str) -> bool:
+        '''
+        Check if a string can be coverted to a float
+        '''
+        try:
+            float(var)
+            return True
+        except ValueError:
+            return False
+        
 
 if __name__ == '__main__':
     connector = DatabaseConnector('db_creds_aws_rds.yaml')
