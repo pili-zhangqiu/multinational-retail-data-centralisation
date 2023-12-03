@@ -1,3 +1,5 @@
+import boto3
+import os
 import pandas as pd
 import requests
 import sys
@@ -11,14 +13,28 @@ class DataExtractor():
     '''
     Utility class to extract data from multiple sources, including: CSV files, APIs and S3 buckets.
     '''
-    def __init__(self):
+    def __init__(self, aws_credentials_filepath: str):
         '''
         Initialise DataExtractor class and load class variables
         '''
+        # Parameters to receive data from the AWS API - Store data
         self._api_stores_headers = {
             'x-api-key': self.retrieve_creds('db_creds_aws_api.yaml')['X_API_KEY']
             }
         self._api_stores_base_url = 'https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod'
+
+        # Parameters to receive data from the AWS S3 Bucket - Product data
+        self._aws_access_key = self.read_db_creds(aws_credentials_filepath)['AWS_ACCESS_KEY']
+        self._aws_secret_key = self.read_db_creds(aws_credentials_filepath)['AWS_SECRET_ACCESS_KEY']
+
+    def read_db_creds(self, credentials_filepath) -> dict:
+        '''
+        Read the credentials yaml file and return a dictionary of the credentials.
+        '''
+        with open(credentials_filepath, 'r') as file:
+            credentials = yaml.safe_load(file)
+
+        return credentials
 
     def read_rds_table(self, db_connector: DatabaseConnector, table_name: str) -> pd.DataFrame:
         '''
@@ -122,6 +138,33 @@ class DataExtractor():
 
         df_stores_data = pd.concat(stores_data)
         return df_stores_data
+    
+    def extract_from_s3(self, s3_url: str) -> pd.DataFrame:
+        '''
+        Download and extract the information from an AWS S3 bucket and return a pandas dataframe.
+        This is in the format: s3://{bucket}/{key}
+        '''
+        # Parse url
+        bucket = s3_url.split('/')[2]
+        key = s3_url.split('/')[3]
+        download_dir = 's3_downloads'
+        download_filepath = f"{download_dir}/{key}"
+
+        # Check whether the specified path exists or not
+        isExist = os.path.exists(download_dir)
+        if not isExist:     
+            os.makedirs(download_dir)   # Create a new directory if it does not exist
+            print(f"Created a new directory to store S3 Bucket data: {download_dir}")
+
+        # Load AWS credentials and S3 client
+        s3 = boto3.client('s3',
+            aws_access_key_id=self._aws_access_key,
+            aws_secret_access_key= self._aws_secret_key)
+        
+        # Download file
+        s3.download_file(bucket, key, download_filepath)
+
+        return pd.read_csv(download_filepath)
 
 if __name__ == '__main__':
     connector = DatabaseConnector('db_creds_aws_rds.yaml')
