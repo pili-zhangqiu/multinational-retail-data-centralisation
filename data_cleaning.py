@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import re
 import string
 import yaml
 
@@ -44,7 +45,7 @@ class DataCleaning():
         df = self.clean_card_number(df, 'card_number')  # Remove invalid card numbers
         return df
     
-    def called_clean_store_data (self, df: pd.DataFrame) -> pd.DataFrame:
+    def called_clean_store_data(self, df: pd.DataFrame) -> pd.DataFrame:
         '''
         Clean store data, removing any erroneous values, NULL values or errors with formatting.
         '''
@@ -60,6 +61,17 @@ class DataCleaning():
         df = self.clean_names(df, 'locality')         # Remove all rows containing invalid localities
         df = self.clean_country_codes(df)             # Remove all rows containing invalid or non-UN approved country codes
         df = self.clean_continents(df, 'continent')   # Remove all rows containing invalid or non-UN approved country codes
+
+        return df
+    
+    def clean_products_data(self, df: pd.DataFrame) -> pd.DataFrame:
+        '''
+        Clean products data, removing any erroneous values, NULL values or errors with formatting.
+        '''
+        df = self.clean_nulls(df)                     # Remove all rows containing NULL values
+
+        # Clean products-specific columns
+        df = self.convert_product_weights(df, 'weight')                # Convert all weights to kg
 
         return df
 
@@ -301,8 +313,38 @@ class DataCleaning():
         
         except IndexError:
             return False
-
         
+    # ------------- Product table specific data cleaning utils -------------    
+    def convert_product_weights(self, df: pd.DataFrame, *column_names) -> pd.DataFrame:
+        """
+        Given a pandas dataframe, return a new dataframe with cleaned weight columns, where all values are represented in kg.
+
+        For volumes, it uses a 1:1 ratio of ml to g as a rough estimate for the rows containing ml.
+        """
+        for column in column_names:
+            # Apply weight conversion function to all values in the given column
+            df[column] = df[column].apply(self.convert_to_kg)
+
+        return df
+    
+    @staticmethod
+    def convert_to_kg(weight: str) -> float:
+        try:
+            # Separate numeric value from units name (e.g. g, kg, ml)    
+            value = re.split('\s*(?:kg|g|l|ml)', weight)[0]
+            units = re.findall('\s*(?:kg|g|l|ml)', weight)[0]
+
+            # Check that it is a positive integer number
+            if units == 'kg' or units == 'l':
+                return round(float(value), 3)               # Assume 1:1 conversion ratio from l to kg
+            elif units == 'g' or units == 'ml':
+                return round((float(value) * 0.001), 3)     # Assume 1:1 conversion ratio from ml to g
+            else:
+                return 'NaN'
+            
+        except:
+            return 'NaN'
+                
 
 if __name__ == '__main__':
     connector = DatabaseConnector('db_creds_aws_rds.yaml')
