@@ -1,6 +1,7 @@
 # Database
 db_creds_aws_rds.yaml
 db_creds_aws_api.yaml
+db_creds_aws_sso.yaml
 db_creds_local.yaml
 
 # Byte-compiled / optimized / DLL files
