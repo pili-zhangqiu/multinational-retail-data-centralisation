@@ -79,8 +79,4 @@ if __name__ == '__main__':
     # ------------------ Product Data ------------------
     df_products = extractor.extract_from_s3('s3://data-handling-public/products.csv')
     
-    print(df_products['weight'].values.tolist())
-    print("-----------")
-    
     df_products = cleaner.clean_products_data(df_products)
-    print(df_products['weight'].values.tolist())

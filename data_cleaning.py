@@ -68,10 +68,12 @@ class DataCleaning():
         '''
         Clean products data, removing any erroneous values, NULL values or errors with formatting.
         '''
-        df = self.clean_nulls(df)                     # Remove all rows containing NULL values
+        df = self.clean_nulls(df)                               # Remove all rows containing NULL values
 
-        # Clean products-specific columns
-        df = self.convert_product_weights(df, 'weight')                # Convert all weights to kg
+        # Convert all weights to a common measurement unit (kg)
+        df = self.convert_product_weights(df, 'weight')
+        df.rename(columns={'weight': 'weight_in_kg'})
+        df = self.clean_nulls(df)
 
         return df
 
