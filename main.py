@@ -64,7 +64,8 @@ if __name__ == '__main__':
     '''    
     print('\n----- STORE DATA: -----')
 
-    # Retrieve data from all stores   
+    # Retrieve data from all stores from API  
+    print('Retrieving data throught API...')
     df_stores = extractor.retrieve_stores_data()
     
     # Clean stores data
@@ -77,6 +78,16 @@ if __name__ == '__main__':
     '''
 
     # ------------------ Product Data ------------------
+    print('\n----- PRODUCT DATA: -----')
+
+    # Retrieve data for products from S3 Bucket 
+    print('Extracting data from S3 Bucket...')
     df_products = extractor.extract_from_s3('s3://data-handling-public/products.csv')
     
+    # Clean products data
+    print('\nCleaning products data...')
     df_products = cleaner.clean_products_data(df_products)
+
+    # Upload dataframe as table to the local PostgreSQL database
+    print('\nUploading dataframe to local database...')
+    connector_local.upload_to_db(df_products, 'dim_products')
