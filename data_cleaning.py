@@ -97,9 +97,10 @@ class DataCleaning():
         df = self.clean_uuid(df, 'uuid')                 # Remove rows containing invalid UUID
         df = self.clean_product_code(df)                 # Remove rows containing invalid product codes
         df = self.remove_future_dates(df, 'date_added')  # Remove rows containing invalid dates added
+        df = self.convert_boolean(df=df, column_names_arr=['removed'], true_value='Still_avaliable', false_value='Removed')
 
         # Final cleaning of nulls
-        df = self.clean_nulls(df)                        
+        df = self.clean_nulls(df)          
 
         return df
 
@@ -192,6 +193,33 @@ class DataCleaning():
         if country_code_uppercase in list(self.validation_utils['un_country_list'].keys()):
             return True
         else: return False
+    
+    def convert_boolean(self, df: pd.DataFrame, column_names_arr: List[str], true_value: str, false_value: str) -> pd.DataFrame:
+        '''
+        Convert values in a dataframe column into boolean
+        '''
+        for column in column_names_arr:
+            # Convert to lowercase for easy comparison
+            true_value_lowercase = true_value.lower()
+            false_value_lowercase = false_value.lower()
+
+            # Convert to boolean
+            df[column] = df[column].apply(self.is_true, args=(true_value_lowercase, false_value_lowercase))
+
+        return df
+    
+    @staticmethod
+    def is_true(string_to_check: str, true_value: str, false_value: str) -> bool:
+        '''
+        Returns whether the value should be True of False, given specifc values.
+        '''
+        string_to_check_lowercase = string_to_check.lower()
+
+        if string_to_check_lowercase == true_value:
+            return True
+        elif string_to_check_lowercase == false_value:
+            return False
+        else: return 'NaN'
     
     def is_alphabetical(self, var: str) -> bool:
         '''
@@ -456,7 +484,7 @@ class DataCleaning():
         
         except:
             return False
-    
+        
     def clean_product_code(self, df: pd.DataFrame) -> pd.DataFrame:
         # Check if it's a valid product code (e.g. U3-5148457q), if not remove
         df = df[(df['product_code'].apply(self.is_valid_product_code))]      
