@@ -15,7 +15,7 @@ if __name__ == '__main__':
     connector_local = DatabaseConnector('db_creds_local.yaml')
 
     # Prepare instances of extraction and cleaning utility classes
-    extractor = DataExtractor()
+    extractor = DataExtractor('db_creds_aws_sso.yaml')
     cleaner = DataCleaning()
     
     # ------------------ User Data ------------------
@@ -61,9 +61,11 @@ if __name__ == '__main__':
     '''
 
     # ------------------ Store Data ------------------
+    '''    
     print('\n----- STORE DATA: -----')
 
-    # Retrieve data from all stores   
+    # Retrieve data from all stores from API  
+    print('Retrieving data throught API...')
     df_stores = extractor.retrieve_stores_data()
     
     # Clean stores data
@@ -73,3 +75,20 @@ if __name__ == '__main__':
     # Upload dataframe as table to the local PostgreSQL database
     print('\nUploading dataframe to local database...')
     connector_local.upload_to_db(df_stores, 'dim_store_details')
+    '''
+
+    # ------------------ Product Data ------------------
+    print('\n----- PRODUCT DATA: -----')
+
+    # Retrieve data for products from S3 Bucket 
+    print('Extracting data from S3 Bucket...')
+    df_products = extractor.extract_from_s3('s3://data-handling-public/products.csv')
+    
+    # Clean products data
+    print('\nCleaning products data...')
+    df_products = cleaner.clean_products_data(df_products)
+
+    # Upload dataframe as table to the local PostgreSQL database
+    print('\nUploading dataframe to local database...')
+    connector_local.upload_to_db(df_products, 'dim_products')
+    
