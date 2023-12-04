@@ -91,3 +91,4 @@ if __name__ == '__main__':
     # Upload dataframe as table to the local PostgreSQL database
     print('\nUploading dataframe to local database...')
     connector_local.upload_to_db(df_products, 'dim_products')
+    
