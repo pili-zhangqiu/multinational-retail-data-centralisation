@@ -95,6 +95,7 @@ if __name__ == '__main__':
     '''
     
     # ------------------ Orders Data ------------------
+    '''
     print('\n----- ORDERS DATA: -----')
 
     # Extract orders data from RDS
@@ -107,4 +108,13 @@ if __name__ == '__main__':
 
     # Upload dataframe as table to the local PostgreSQL database
     print('\nUploading dataframe to local database...')
-    connector_local.upload_to_db(df_orders, 'orders_table') 
+    connector_local.upload_to_db(df_orders, 'orders_table')
+    '''
+
+    # ------------------ Event Dates Data ------------------
+    print('\n----- EVENT DATES DATA: -----')
+
+    # Retrieve json for products from S3 Bucket 
+    print('Extracting data from S3 Bucket...')
+    df_dates = extractor.extract_from_s3('https://data-handling-public.s3.eu-west-1.amazonaws.com/date_details.json')
+    
