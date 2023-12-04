@@ -98,5 +98,13 @@ if __name__ == '__main__':
     print('\n----- ORDERS DATA: -----')
 
     # Extract orders data from RDS
+    print('Extracting data from database...')
     df_orders = extractor.read_rds_table(connector_aws_rds, 'orders_table')
-    print(df_orders)  
+
+    # Clean orders data
+    print('\nCleaning orders data...')
+    df_orders = cleaner.clean_orders_data(df_orders)
+
+    # Upload dataframe as table to the local PostgreSQL database
+    print('\nUploading dataframe to local database...')
+    connector_local.upload_to_db(df_orders, 'orders_table') 

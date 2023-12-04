@@ -103,6 +103,15 @@ class DataCleaning():
         df = self.clean_nulls(df)          
 
         return df
+    
+    def clean_orders_data(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Remove unnecessary columns
+        df = df.drop(columns=['first_name', 'last_name', '1'])
+        
+        # Remove rows containing NULL values
+        df = self.clean_nulls(df)
+
+        return df
 
     # ------------- General data cleaning utils -------------    
     def clean_nulls(self, df: pd.DataFrame) -> pd.DataFrame:
