@@ -25,12 +25,12 @@ if __name__ == '__main__':
     # Extract table data
     read_table_name = 'legacy_users'
     
-    print('Reading user data from database...')
+    print('Extracting user data from AWS database...')
     df_user = extractor.read_rds_table(connector_aws_rds, read_table_name)
     print('DONE \n')
 
     # Clean the data
-    print('Cleaning user data...')
+    print('Cleaning data...')
     df_user = cleaner.clean_user_data(df_user)
     print('DONE \n')
 
@@ -46,12 +46,12 @@ if __name__ == '__main__':
     # Extract table data from PDF
     pdf_url = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
     
-    print('Extracting table from PDF...')
+    print('Extracting card table from PDF...')
     df_card = extractor.retrieve_pdf_data(pdf_url)
     print('DONE \n')
 
     # Clean the data
-    print('Cleaning card data...')
+    print('Cleaning data...')
     df_card = cleaner.clean_card_data(df_card)
     print('DONE \n')
 
@@ -65,11 +65,11 @@ if __name__ == '__main__':
     print('\n----- STORE DATA: -----')
 
     # Retrieve data from all stores from API  
-    print('Retrieving data throught API...')
+    print('Retrieving store data through API...')
     df_stores = extractor.retrieve_stores_data()
     
     # Clean stores data
-    print('\nCleaning store data...')
+    print('\nCleaning data...')
     df_stores = cleaner.called_clean_store_data(df_stores)
     
     # Upload dataframe as table to the local PostgreSQL database
@@ -82,11 +82,11 @@ if __name__ == '__main__':
     print('\n----- PRODUCT DATA: -----')
 
     # Retrieve data for products from S3 Bucket 
-    print('Extracting data from S3 Bucket...')
+    print('Extracting product data from S3 Bucket...')
     df_products = extractor.extract_from_s3('s3://data-handling-public/products.csv')
     
     # Clean products data
-    print('\nCleaning products data...')
+    print('\nCleaning data...')
     df_products = cleaner.clean_products_data(df_products)
 
     # Upload dataframe as table to the local PostgreSQL database
@@ -99,11 +99,11 @@ if __name__ == '__main__':
     print('\n----- ORDERS DATA: -----')
 
     # Extract orders data from RDS
-    print('Extracting data from database...')
+    print('Extracting orders data from AWS database...')
     df_orders = extractor.read_rds_table(connector_aws_rds, 'orders_table')
 
     # Clean orders data
-    print('\nCleaning orders data...')
+    print('\nCleaning data...')
     df_orders = cleaner.clean_orders_data(df_orders)
 
     # Upload dataframe as table to the local PostgreSQL database
@@ -115,6 +115,13 @@ if __name__ == '__main__':
     print('\n----- EVENT DATES DATA: -----')
 
     # Retrieve json for products from S3 Bucket 
-    print('Extracting data from S3 Bucket...')
+    print('Extracting dates data from S3 Bucket...')
     df_dates = extractor.extract_from_s3('https://data-handling-public.s3.eu-west-1.amazonaws.com/date_details.json')
-    
+
+    # Clean dates data
+    print('\nCleaning data...')
+    df_dates = cleaner.clean_dates_data(df_dates)
+
+    # Upload dataframe as table to the local PostgreSQL database
+    print('\nUploading dataframe to local database...')
+    connector_local.upload_to_db(df_dates, 'dim_date_times')
