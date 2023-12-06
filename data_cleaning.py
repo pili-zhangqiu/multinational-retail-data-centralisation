@@ -112,6 +112,15 @@ class DataCleaning():
         df = self.clean_nulls(df)
 
         return df
+    
+    def clean_dates_data(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Remove rows containing NULL values
+        df = self.clean_nulls(df)
+
+        # Clean other columns
+        df = self.clean_uuid(df, 'date_uuid')                 # Remove rows containing invalid UUID
+
+        return df
 
     # ------------- General data cleaning utils -------------    
     def clean_nulls(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -488,8 +497,11 @@ class DataCleaning():
                 uuid_lowercase = uuid.lower()
                 for char in uuid_lowercase:
                     if char not in valid_characters:
+                        print(f'Invalid char: {char}')
                         return False
                 return True
+            else: 
+                return False
         
         except:
             return False
