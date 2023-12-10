@@ -8,8 +8,9 @@
 
 <!-- PROJECT LOGO -->
 <p align="center">
-  <img src="./img/logo.jpeg" style="scale: 60%"/>
-  Multi-source data extraction, cleaning and uploading for retail.
+  <img src="./img/logo.jpeg" style="width: 400px"/>
+  <br>
+  Extract, process and unify data from multiple sources in a single PostgreSQL database.
 </p>
 
 
