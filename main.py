@@ -19,7 +19,6 @@ if __name__ == '__main__':
     cleaner = DataCleaning()
     
     # ------------------ User Data ------------------
-    '''    
     print('\n----- USER DATA: -----')
 
     # Extract table data
@@ -37,10 +36,8 @@ if __name__ == '__main__':
     # Upload dataframe as table to the local PostgreSQL database
     print('Uploading dataframe to local database...')
     connector_local.upload_to_db(df_user, 'dim_users')
-    '''
     
     # ------------------ Card Data ------------------
-    '''
     print('\n----- CARD DATA: -----')
 
     # Extract table data from PDF
@@ -58,10 +55,8 @@ if __name__ == '__main__':
     # Upload dataframe as table to the local PostgreSQL database
     print('Uploading dataframe to local database...')
     connector_local.upload_to_db(df_card, 'dim_card_details')
-    '''
 
     # ------------------ Store Data ------------------
-    '''    
     print('\n----- STORE DATA: -----')
 
     # Retrieve data from all stores from API  
@@ -75,10 +70,8 @@ if __name__ == '__main__':
     # Upload dataframe as table to the local PostgreSQL database
     print('\nUploading dataframe to local database...')
     connector_local.upload_to_db(df_stores, 'dim_store_details')
-    '''
 
     # ------------------ Product Data ------------------
-    '''
     print('\n----- PRODUCT DATA: -----')
 
     # Retrieve data for products from S3 Bucket 
@@ -92,10 +85,8 @@ if __name__ == '__main__':
     # Upload dataframe as table to the local PostgreSQL database
     print('\nUploading dataframe to local database...')
     connector_local.upload_to_db(df_products, 'dim_products')
-    '''
     
     # ------------------ Orders Data ------------------
-    '''
     print('\n----- ORDERS DATA: -----')
 
     # Extract orders data from RDS
@@ -109,7 +100,6 @@ if __name__ == '__main__':
     # Upload dataframe as table to the local PostgreSQL database
     print('\nUploading dataframe to local database...')
     connector_local.upload_to_db(df_orders, 'orders_table')
-    '''
 
     # ------------------ Event Dates Data ------------------
     print('\n----- EVENT DATES DATA: -----')
