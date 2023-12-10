@@ -11,7 +11,8 @@ from database_utils import DatabaseConnector
 
 class DataExtractor():
     '''
-    Utility class to extract data from multiple sources, including: CSV files, APIs and S3 buckets.
+    Utility class to extract data from multiple sources, including: REST APIs, S3 buckets, 
+    structured and unstructured data files (e.g. .csv, .json, .pdf).
     '''
     def __init__(self, aws_credentials_filepath: str):
         '''
