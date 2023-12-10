@@ -2,9 +2,12 @@
 Main file to create connections to databases (i.e. AWS), extract/process data
 and upload to local database (i.e. PostgreSQL)
 '''
+
+# Project class imports
 from database_utils import DatabaseConnector
 from data_cleaning import DataCleaning
 from data_extraction import DataExtractor
+
 
 if __name__ == '__main__':
     '''

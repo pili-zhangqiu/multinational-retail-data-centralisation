@@ -1,3 +1,6 @@
+# Library imports
+from tabula.io import read_pdf
+
 import boto3
 import os
 import pandas as pd
@@ -5,9 +8,9 @@ import requests
 import sys
 import yaml
 
-from tabula.io import read_pdf
-
+# Project class imports
 from database_utils import DatabaseConnector
+
 
 class DataExtractor():
     '''

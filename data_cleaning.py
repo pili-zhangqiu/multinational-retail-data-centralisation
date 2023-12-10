@@ -1,15 +1,18 @@
+# Library imports
+from datetime import date
+from typing import List
+from unidecode import unidecode
+
 import numpy as np
 import pandas as pd
 import re
 import string
 import yaml
 
-from datetime import date
-from typing import List
-from unidecode import unidecode
-
+# Project class imports
 from database_utils import DatabaseConnector
 from data_extraction import DataExtractor
+
 
 class DataCleaning():
     '''
