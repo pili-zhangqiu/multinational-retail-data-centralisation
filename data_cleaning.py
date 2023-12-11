@@ -67,7 +67,7 @@ class DataCleaning():
 
         # Clean store-specific columns
         df = self.clean_store_code(df)                # Remove rows containing invalid store codes
-        df[pd.to_numeric(df['staff_numbers'], errors='coerce').notnull()]   # Remove rows containing non-numerical staff numbers
+        df = self.clean_staff_numbers(df)             # Remove rows containing non-numerical staff numbers
 
         # Clean other columns
         df = self.clean_lat_lon(df)                         # Remove rows containing invalid latitude or longitude
@@ -333,7 +333,11 @@ class DataCleaning():
         # Check if it's a valid latitude and longitude, if not remove
         df = df[(df['latitude'].apply(self.is_valid_lat))]
         df = df[(df['longitude'].apply(self.is_valid_lon))]
-        
+
+        # Convert to float
+        df['latitude'] = pd.to_numeric(df['latitude'])
+        df['longitude'] = pd.to_numeric(df['longitude'])
+
         return df
       
     def is_valid_lat(self, latitude: str) -> bool:
@@ -396,6 +400,15 @@ class DataCleaning():
         except IndexError:
             return False
         
+    def clean_staff_numbers(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Remove rows containing non-numerical staff numbers
+        df = df[pd.to_numeric(df['staff_numbers'], errors='coerce').notnull()]   
+        
+        # Convert column to numeric value
+        df['staff_numbers'] = pd.to_numeric(df['staff_numbers'])
+
+        return df
+
     # ------------- Product table specific data cleaning utils -------------    
     def convert_product_weights(self, df: pd.DataFrame, *column_names) -> pd.DataFrame:
         """
