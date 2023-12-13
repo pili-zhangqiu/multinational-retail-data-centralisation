@@ -1,3 +1,4 @@
+--Cast column datatypes:
 ALTER TABLE dim_users
 
 ALTER COLUMN first_name TYPE varchar(255),

@@ -1,3 +1,4 @@
+--Cast column datatypes:
 ALTER TABLE orders_table
 
 ALTER COLUMN date_uuid TYPE uuid USING date_uuid::uuid,

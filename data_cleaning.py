@@ -92,8 +92,8 @@ class DataCleaning():
         df = df.rename(columns={'weight': 'weight_in_kg'})
 
         # Convert prices to float
-        df = self.convert_product_prices(df, 'product_price')
-        df = df.rename(columns={'product_price': 'product_price_in_gbp'})
+        #df = self.convert_product_prices(df, 'product_price')
+        #df = df.rename(columns={'product_price': 'product_price_in_gbp'})
 
         # Clean other columns
         df = self.clean_ean(df, 'EAN')                   # Remove rows containing invalid EAN codes

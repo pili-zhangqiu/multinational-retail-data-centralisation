@@ -1,3 +1,4 @@
+--Cast column datatypes:
 ALTER TABLE dim_store_details
 
 ALTER COLUMN longitude TYPE float,
