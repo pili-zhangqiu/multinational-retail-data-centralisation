@@ -91,16 +91,11 @@ class DataCleaning():
         df = self.convert_product_weights(df, 'weight')
         df = df.rename(columns={'weight': 'weight_in_kg'})
 
-        # Convert prices to float
-        #df = self.convert_product_prices(df, 'product_price')
-        #df = df.rename(columns={'product_price': 'product_price_in_gbp'})
-
         # Clean other columns
         df = self.clean_ean(df, 'EAN')                   # Remove rows containing invalid EAN codes
         df = self.clean_uuid(df, 'uuid')                 # Remove rows containing invalid UUID
         df = self.clean_product_code(df)                 # Remove rows containing invalid product codes
         df = self.remove_future_dates(df, 'date_added')  # Remove rows containing invalid dates added
-        df = self.convert_boolean(df=df, column_names_arr=['removed'], true_value='Still_avaliable', false_value='Removed')
 
         # Final cleaning of nulls
         df = self.clean_nulls(df)          
