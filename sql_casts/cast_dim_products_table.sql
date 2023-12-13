@@ -1,6 +1,9 @@
 --Remove £ symbol from price column:
+ALTER TABLE dim_products
+RENAME COLUMN product_price to product_price_in_gbp;
+
 UPDATE dim_products 
-SET product_price = REPLACE(product_price, '£', '');
+SET product_price_in_gbp = REPLACE(product_price_in_gbp, '£', '');
 
 --Add weight class column:
 ALTER TABLE dim_products 
@@ -19,11 +22,18 @@ SET weight_class =
 ALTER TABLE dim_products
 RENAME COLUMN removed to still_available;
 
-UPDATE dim_products 
-SET still_available = 
+ALTER TABLE dim_products ALTER still_available TYPE bool USING 
     CASE
         WHEN still_available = 'Still_avaliable' THEN TRUE
         WHEN still_available = 'Removed' THEN FALSE
     END;
 
 --Cast column datatypes:
+ALTER TABLE dim_products
+ALTER COLUMN product_price_in_gbp TYPE float USING product_price_in_gbp::float,
+ALTER COLUMN weight_in_kg TYPE float,
+ALTER COLUMN "EAN" TYPE varchar(14),
+ALTER COLUMN product_code TYPE varchar(12),
+ALTER COLUMN date_added TYPE date,
+ALTER COLUMN uuid TYPE uuid USING uuid::uuid,
+ALTER COLUMN still_available TYPE boolean;
