@@ -67,7 +67,7 @@ class DataCleaning():
 
         # Clean store-specific columns
         df = self.clean_store_code(df)                # Remove rows containing invalid store codes
-        df[pd.to_numeric(df['staff_numbers'], errors='coerce').notnull()]   # Remove rows containing non-numerical staff numbers
+        df = self.clean_staff_numbers(df)             # Remove rows containing non-numerical staff numbers
 
         # Clean other columns
         df = self.clean_lat_lon(df)                         # Remove rows containing invalid latitude or longitude
@@ -91,16 +91,11 @@ class DataCleaning():
         df = self.convert_product_weights(df, 'weight')
         df = df.rename(columns={'weight': 'weight_in_kg'})
 
-        # Convert prices to float
-        df = self.convert_product_prices(df, 'product_price')
-        df = df.rename(columns={'product_price': 'product_price_in_gbp'})
-
         # Clean other columns
         df = self.clean_ean(df, 'EAN')                   # Remove rows containing invalid EAN codes
         df = self.clean_uuid(df, 'uuid')                 # Remove rows containing invalid UUID
         df = self.clean_product_code(df)                 # Remove rows containing invalid product codes
         df = self.remove_future_dates(df, 'date_added')  # Remove rows containing invalid dates added
-        df = self.convert_boolean(df=df, column_names_arr=['removed'], true_value='Still_avaliable', false_value='Removed')
 
         # Final cleaning of nulls
         df = self.clean_nulls(df)          
@@ -333,7 +328,11 @@ class DataCleaning():
         # Check if it's a valid latitude and longitude, if not remove
         df = df[(df['latitude'].apply(self.is_valid_lat))]
         df = df[(df['longitude'].apply(self.is_valid_lon))]
-        
+
+        # Convert to float
+        df['latitude'] = pd.to_numeric(df['latitude'])
+        df['longitude'] = pd.to_numeric(df['longitude'])
+
         return df
       
     def is_valid_lat(self, latitude: str) -> bool:
@@ -396,6 +395,15 @@ class DataCleaning():
         except IndexError:
             return False
         
+    def clean_staff_numbers(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Remove rows containing non-numerical staff numbers
+        df = df[pd.to_numeric(df['staff_numbers'], errors='coerce').notnull()]   
+        
+        # Convert column to numeric value
+        df['staff_numbers'] = pd.to_numeric(df['staff_numbers'])
+
+        return df
+
     # ------------- Product table specific data cleaning utils -------------    
     def convert_product_weights(self, df: pd.DataFrame, *column_names) -> pd.DataFrame:
         """

@@ -60,19 +60,58 @@
 ### Summary
 This project centralises data by extracting and cleaning data from multiple sources and uploading them into a central PostgreSQL database.
 
-- `Key platforms`: PostgreSQL, AWS (S3 Buckets, Amazon RDS), REST API
-- `Other file types`: Structured (.json, .csv), Unstructured (.pdf)
-- `Languages and libraries`: Python (Pandas, Boto3)
+- `Key platforms and technologies`: PostgreSQL, AWS (S3 Buckets, Amazon RDS), REST API
+- `Files parsed`: Structured (JSON, CSV), Unstructured (PDF)
+- `Languages and libraries`: Python (Pandas, Numpy, Boto3, SQLAlchemy)
 
-### Utilities
-There are three main utility class modules, which can be found under the `/src/` folder:
+<!-- ABOUT THE PROJECT -->
+## Database Schema
+
+### Entity-Relationship Diagram (ERD)
+The database follows a ``star schema`` design, with ***orders_table*** as its central or fact table. 
+
+A total of 5 dimension tables are then linked to the fact table through primary and foreign key relationships, as specified below.
+
+<p align="center">
+  <img src="./img/database_erd.png" style="width: 600px"/>
+</p>
+
+### Table origins
+Each table was extracted from a difference source. Procedures followed to extract the data include:
+
+- Retrieving data from **AWS RDS databases**
+- Retrieving data through **REST API** requests
+- Downloading files from an **AWS S3 buckets**
+- Parsing:
+    - Unstructured (**PDF**) files
+    - Structured or Semi-Structured (**CSV** and **JSON**) files
+
+
+<!-- Project Flow -->
+## Project Flow
+
+### 1. Data Extraction, Cleaning & Database Initialisation
+The first step is to extract and clean the data originating from multiple sources and create a single, unified database containing this information.
+
+To achieve this, three main utility class modules were created, which can be found under the `src/` folder:
 
 - **database_utils.py**: Utility class to connect and upload data to a database.
 - **data_extraction.py**: Utility class to extract data from multiple sources, including: REST APIs, S3 buckets, structured and unstructured data files (e.g. .csv, .json, .pdf)
 - **data_cleaning.py**: Utility class to clean data from specific data sources.
 
-The main application logic is then defined in:
+The main application logic to extract, clean and upload data to the central database is then defined in:
 - **main.py**: Main script containing the application logic. It extracts and cleans data from multiple sources and uploads them to a local database (i.e. PostgreSQL).
+
+### 2. Database Schema Design
+Now that the database has been created, the next step is to define the relationship between the database tables.
+
+Before defining the relationship between tables, all columns in the tables were **casted to their correct data types**. Information on the casting can be found in the casting ***.sql*** files inside the ``sql_schema/`` folder.
+
+To connect the fact table with the dimension tables, primary and foreign keys were defined, as shown in the ***primary_keys.sql*** and ***foreign_keys.sql*** files in the ``sql_schema/`` folder.
+
+### 3. Querying Data & Analysis
+TODO: Add information
+
 
 <!-- Installation -->
 ## Installation
@@ -135,7 +174,7 @@ If you followed the previous steps on installation, you should be able to run th
 To run the script, follow the next steps:
 
 1. Open a command prompt. 
-3. Navigate to the directory where the example script is located. 
+3. Navigate to the directory where the main.py script is located. 
 4. Use the python method to run the example script.
     ```sh
     python main.py
@@ -148,15 +187,30 @@ To run the script, follow the next steps:
 ## File Structure
 
 The repository structure is as follows:
-```sh
+```md
 multinational-retail-data-centralisation/
+│
 ├── src/
+│   Contains utility classes to extract, clean and interact with databases.
 │   ├── database_utils.py
 │   ├── data_extraction.py
-│   └── data_cleaning.py
-├── main.py
+│   ├── data_cleaning.py
+│   └── main.py
+│       Run this script to create a local database from the extracted data.
+│
+├── sql_schema/
+│   Contains .sql files to cast columns and create relationships between tables.
+│   ├── cast_dim_card_details_table.sql
+│   ├── cast_dim_date_times_table.sql
+│   ├── cast_dim_products_table.sql
+│   ├── cast_dim_store_details_table.sql
+│   ├── cast_dim_users_table.sql
+│   ├── cast_orders_table.sql
+│   ├── primary_keys.sql
+│   └── foreigh_keys.sql
+│
 ├── img/
-│   └── logo.jpeg
+│   └── (...)
 ├── LICENSE.txt
 ├── README.md
 └── .gitignore
