@@ -1,3 +1,6 @@
+# Library imports
+from tabula.io import read_pdf
+
 import boto3
 import os
 import pandas as pd
@@ -5,13 +8,14 @@ import requests
 import sys
 import yaml
 
-from tabula.io import read_pdf
-
+# Project class imports
 from database_utils import DatabaseConnector
+
 
 class DataExtractor():
     '''
-    Utility class to extract data from multiple sources, including: CSV files, APIs and S3 buckets.
+    Utility class to extract data from multiple sources, including: REST APIs, S3 buckets, 
+    structured and unstructured data files (e.g. .csv, .json, .pdf).
     '''
     def __init__(self, aws_credentials_filepath: str):
         '''
@@ -142,10 +146,13 @@ class DataExtractor():
     def extract_from_s3(self, s3_url: str) -> pd.DataFrame:
         '''
         Download and extract the information from an AWS S3 bucket and return a pandas dataframe.
-        This is in the format: s3://{bucket}/{key}
+        This is in the format: s3://{bucket}/{key} , where the file to be parsed must be a .csv or .json.
         '''
         # Parse url
         bucket = s3_url.split('/')[2]
+        if '.' in bucket:
+            bucket = bucket.split('.')[0]
+
         key = s3_url.split('/')[3]
         download_dir = 's3_downloads'
         download_filepath = f"{download_dir}/{key}"
@@ -164,7 +171,14 @@ class DataExtractor():
         # Download file
         s3.download_file(bucket, key, download_filepath)
 
-        return pd.read_csv(download_filepath)
+        # Convert to pandas dataframe
+        if key.split('.')[1] == 'csv':
+            return pd.read_csv(download_filepath)
+        elif key.split('.')[1] == 'json':
+            return pd.read_json(download_filepath)
+        else:
+            raise TypeError('Cannot parse file! The file format must be a .csv or .json')
+
 
 if __name__ == '__main__':
     connector = DatabaseConnector('db_creds_aws_rds.yaml')

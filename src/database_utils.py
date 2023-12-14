@@ -1,7 +1,9 @@
+# Library imports
+from sqlalchemy import Engine, create_engine, inspect
+
 import pandas as pd
 import yaml
 
-from sqlalchemy import Engine, create_engine, inspect
 
 class DatabaseConnector():
     '''
