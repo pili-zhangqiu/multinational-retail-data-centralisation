@@ -189,12 +189,12 @@ To run the script, follow the next steps:
 The repository structure is as follows:
 ```md
 multinational-retail-data-centralisation/
-│
 ├── src/
 │   Contains utility classes to extract, clean and interact with databases.
 │   ├── database_utils.py
 │   ├── data_extraction.py
 │   ├── data_cleaning.py
+│   ├── validation_utils.yaml
 │   └── main.py
 │       Run this script to create a local database from the extracted data.
 │
@@ -211,8 +211,8 @@ multinational-retail-data-centralisation/
 │
 ├── img/
 │   └── (...)
-├── LICENSE.txt
 ├── README.md
+├── LICENSE.txt
 └── .gitignore
 ```
 
