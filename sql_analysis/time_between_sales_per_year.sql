@@ -1,20 +1,20 @@
--- -- Get average time between sales per year
+-- Get average time between sales per year
 WITH TIME_BETWEEN_SALES AS (
     SELECT dates.year,
         LEAD(
             TO_TIMESTAMP(
                 dates.year || '-' || dates.month || '-' || dates.day || ' ' || dates.timestamp,
-                'YYYY-MM-DD HH24:MI:SS'
+                'YYYY-MM-DD HH24:MI:SS.FF'
             )
         ) OVER (
             PARTITION BY dates.year
             ORDER BY TO_TIMESTAMP(
                     dates.year || '-' || dates.month || '-' || dates.day || ' ' || dates.timestamp,
-                    'YYYY-MM-DD HH24:MI:SS'
+                    'YYYY-MM-DD HH24:MI:SS.FF'
                 )
         ) - TO_TIMESTAMP(
             dates.year || '-' || dates.month || '-' || dates.day || ' ' || dates.timestamp,
-            'YYYY-MM-DD HH24:MI:SS'
+            'YYYY-MM-DD HH24:MI:SS.FF'
         ) AS time_between_sales
     FROM orders_table orders
     JOIN dim_date_times dates ON orders.date_uuid = dates.date_uuid
