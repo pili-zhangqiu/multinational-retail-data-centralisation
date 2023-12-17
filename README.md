@@ -33,6 +33,21 @@
       <a href="#about-the-project">About The Project</a>
     </li>
     <li>
+      <a href="#databse-schema">Database Schema</a>
+      <ul>
+        <li><a href="#table-origins">Table Origins</a></li>
+        <li><a href="#erd">Entity-Relationship Diagram (ERD)</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#project-flow">Project Flow</a>
+      <ul>
+        <li><a href="#step-data-extraction">1. Data Extraction, Cleaning & Database Initialisation</a></li>
+        <li><a href="#step-schema">2. Database Schema Design</a></li>
+        <li><a href="#step-query">3. Querying Data & Analysis</a></li>
+      </ul>
+    </li>
+    <li>
       <a href="#installation">Installation</a>
       <ul>
         <li><a href="#clone-repo">Step 1: Clone the Repository</a></li>
@@ -58,7 +73,9 @@
 ## About the Project
 
 ### Summary
-This project centralises data by extracting and cleaning data from multiple sources and uploading them into a central PostgreSQL database.
+The project goal is to transform and **centralize the data infrastructure of a multinational retailer**. The existing decentralized data architecture posed challenges in terms of efficiency, data accessibility, and strategic decision-making. By centralizing the data, the project aimed to streamline information management, enhance data consistency, and provide a unified and comprehensive view of the company's operations. 
+
+To achieve this goal, the project extracts and cleans data from multiple sources and uploads them into a new central PostgreSQL database.
 
 - **`Key platforms and technologies`**: PostgreSQL, AWS (S3 Buckets, Amazon RDS), REST API
 - **`Files parsed`**: Structured (JSON, CSV), Unstructured (PDF)
@@ -79,6 +96,8 @@ Each table was extracted from a difference source. Procedures followed to extrac
     - Unstructured (**PDF**) files
     - Structured or Semi-Structured (**CSV** and **JSON**) files
 
+<a name="erd"></a>
+
 ### Entity-Relationship Diagram (ERD)
 The database follows a **``star schema``** design, with ***orders_table*** as its central or fact table. 
 
@@ -93,6 +112,8 @@ A total of 5 dimension tables are then linked to the fact table through primary 
 <!-- Project Flow -->
 ## Project Flow
 
+<a name="step-data-extraction"></a>
+
 ### 1. Data Extraction, Cleaning & Database Initialisation
 The first step is to extract and clean the data originating from multiple sources and create a single, unified database containing this information.
 
@@ -105,12 +126,16 @@ To achieve this, three main utility class modules were created:
 The main application logic to extract, clean and upload data to the central database is then defined in:
 - **main.py**: Main script containing the application logic. It extracts and cleans data from multiple sources and uploads them to a local database (i.e. PostgreSQL).
 
+<a name="step-schema"></a>
+
 ### 2. Database Schema Design
 Now that the database has been created, the next step is to define the relationship between the database tables.
 
 Before defining the relationship between tables, all columns in the tables were **casted to their correct data types**. Information on the casting can be found in the casting ***.sql*** files inside the ``sql_schema/`` folder.
 
 To connect the fact table with the dimension tables, primary and foreign keys were defined, as shown in the ***primary_keys.sql*** and ***foreign_keys.sql*** files in the ``sql_schema/`` folder.
+
+<a name="step-query"></a>
 
 ### 3. Querying Data & Analysis
 Queries were performed to analyse and answer key questions on business performance.
@@ -256,11 +281,13 @@ For this step, we recommend cloning the repository using `Git`. If you do not ha
 
 ### Step 2: Setup the environment
 
-This project only uses Python in-built modules, and as such you will not need to install any third-party libraries.
+To create the virtual environment, follow the instructions provided in the Python official page [here](https://docs.python.org/3/library/venv.html).
 
-To set up the virtual environment, just run the `setup_venv.py` file. This will initialise a virtual environment with all the necessary libraries listed in the `requirements.txt`.
+After activating the virtual environment, install all the necessary libraries listed in the `requirements.txt`. To do so, run the command:
 
-TODO: Add setup_venv.py
+```
+$ pip install -r /path/to/requirements.txt
+```
 
 If you don't have Python, you can find more information on how to install it [here][url-installing-python].
 
