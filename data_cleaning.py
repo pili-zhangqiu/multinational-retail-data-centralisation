@@ -91,9 +91,7 @@ class DataCleaning():
         df = df.rename(columns={'weight': 'weight_in_kg'})
 
         # Clean other columns
-        df = self.clean_ean(df, 'EAN')                   # Remove rows containing invalid EAN codes
         df = self.clean_uuid(df, 'uuid')                 # Remove rows containing invalid UUID
-        df = self.clean_product_code(df)                 # Remove rows containing invalid product codes
         df = self.remove_future_dates(df, 'date_added')  # Remove rows containing invalid dates added
 
         # Final cleaning of nulls
