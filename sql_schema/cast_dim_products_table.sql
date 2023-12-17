@@ -32,7 +32,7 @@ ALTER TABLE dim_products ALTER still_available TYPE bool USING
 ALTER TABLE dim_products
 ALTER COLUMN product_price_in_gbp TYPE float USING product_price_in_gbp::float,
 ALTER COLUMN weight_in_kg TYPE float,
-ALTER COLUMN "EAN" TYPE varchar(14),
+ALTER COLUMN "EAN" TYPE varchar(18),
 ALTER COLUMN product_code TYPE varchar(12),
 ALTER COLUMN date_added TYPE date,
 ALTER COLUMN uuid TYPE uuid USING uuid::uuid,

@@ -63,21 +63,20 @@ class DataCleaning():
         Clean store data, removing any erroneous values, NULL values or errors with formatting.
         '''
         df.drop(columns=['lat'], inplace=True)        # Remove the 'lat' column, as it seems to be an empty duplicate of 'latitude'
-        df = self.clean_nulls(df)                     # Remove rows containing NULL values
 
         # Clean store-specific columns
         df = self.clean_store_code(df)                # Remove rows containing invalid store codes
-        df = self.clean_staff_numbers(df)             # Remove rows containing non-numerical staff numbers
 
         # Clean other columns
-        df = self.clean_lat_lon(df)                         # Remove rows containing invalid latitude or longitude
-        df = self.clean_names(df, 'locality')               # Remove rows containing invalid localities
+        df = df.replace('eeEurope','Europe')       # Correct continent typo
         df = self.clean_country_codes(df)                   # Remove rows containing invalid or non-UN approved country codes
         df = self.clean_continents(df, 'continent')         # Remove rows containing wrong continent names
         df = self.remove_future_dates(df, 'opening_date')   # Remove rows containing invalid opening dates
 
-        # Final cleaning of nulls
-        df = self.clean_nulls(df) 
+        # Convert columns to numeric
+        df['latitude'] = pd.to_numeric(df['latitude'], errors='coerce')
+        df['longitude'] = pd.to_numeric(df['longitude'], errors='coerce')
+        df['staff_numbers'] = pd.to_numeric(df['staff_numbers'], errors='coerce')
 
         return df
     
@@ -92,9 +91,7 @@ class DataCleaning():
         df = df.rename(columns={'weight': 'weight_in_kg'})
 
         # Clean other columns
-        df = self.clean_ean(df, 'EAN')                   # Remove rows containing invalid EAN codes
         df = self.clean_uuid(df, 'uuid')                 # Remove rows containing invalid UUID
-        df = self.clean_product_code(df)                 # Remove rows containing invalid product codes
         df = self.remove_future_dates(df, 'date_added')  # Remove rows containing invalid dates added
 
         # Final cleaning of nulls
@@ -168,7 +165,7 @@ class DataCleaning():
         for column in column_names:
             # Remove rows with wrong date formatting
             df[column] = pd.to_datetime(df[column], errors='coerce', yearfirst=True).dt.date  
-            df.dropna(inplace=True)
+            #df.dropna(inplace=True)
 
             # Remove rows where dates are after the current date
             current_date = date.today()
@@ -371,7 +368,7 @@ class DataCleaning():
             code_suffix = store_code.split('-')[1]
 
             # First 2 chars should be letters
-            if len(code_prefix) == 2:
+            if len(code_prefix) == 2 or len(code_prefix) == 3:
                 valid_characters_prefix = list(string.ascii_lowercase)
             
                 prefix_lowercase = code_prefix.lower()
@@ -394,15 +391,6 @@ class DataCleaning():
         
         except IndexError:
             return False
-        
-    def clean_staff_numbers(self, df: pd.DataFrame) -> pd.DataFrame:
-        # Remove rows containing non-numerical staff numbers
-        df = df[pd.to_numeric(df['staff_numbers'], errors='coerce').notnull()]   
-        
-        # Convert column to numeric value
-        df['staff_numbers'] = pd.to_numeric(df['staff_numbers'])
-
-        return df
 
     # ------------- Product table specific data cleaning utils -------------    
     def convert_product_weights(self, df: pd.DataFrame, *column_names) -> pd.DataFrame:
