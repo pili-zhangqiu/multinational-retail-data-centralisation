@@ -33,7 +33,7 @@
       <a href="#about-the-project">About The Project</a>
     </li>
     <li>
-      <a href="#databse-schema">Database Schema</a>
+      <a href="#database-schema">Database Schema</a>
       <ul>
         <li><a href="#table-origins">Table Origins</a></li>
         <li><a href="#erd">Entity-Relationship Diagram (ERD)</a></li>
@@ -77,9 +77,9 @@ The project goal is to transform and **centralize the data infrastructure of a m
 
 To achieve this goal, the project extracts and cleans data from multiple sources and uploads them into a new central PostgreSQL database.
 
-- **`Key platforms and technologies`**: PostgreSQL, AWS (S3 Buckets, Amazon RDS), REST API
-- **`Files parsed`**: Structured (JSON, CSV), Unstructured (PDF)
-- **`Languages and libraries`**: Python (Pandas, Numpy, Boto3, SQLAlchemy)
+- `Key platforms and technologies`: PostgreSQL, AWS (S3 Buckets, Amazon RDS), REST API
+- `Files parsed`: Structured (JSON, CSV), Unstructured (PDF)
+- `Languages and libraries`: Python (Pandas, Numpy, Boto3, SQLAlchemy)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -307,7 +307,7 @@ To run this project, you will have to set up the following credentials and datab
 
 - [**PostgreSQL**](https://www.postgresql.org/) - Store your credentials in a file called:
   - **db_creds_local.yaml**
-- [AWS](https://aws.amazon.com/?nc2=h_lg) - Store your credentials in files called:
+- [**AWS**](https://aws.amazon.com/?nc2=h_lg) - Store your credentials in files called:
   - **db_creds_aws_sso.yaml**
   - **db_creds_aws_api.yaml**
   - **db_creds_aws_rds.yaml**
